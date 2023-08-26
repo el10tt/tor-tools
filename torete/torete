@@ -1,0 +1,114 @@
+#!/bin/bash
+echo "
+@@@@@@@   @@@@@@   @@@@@@@   @@@@@@@@  @@@@@@@  @@@@@@@@
+@@@@@@@  @@@@@@@@  @@@@@@@@  @@@@@@@@  @@@@@@@  @@@@@@@@
+  @@!    @@!  @@@  @@!  @@@  @@!         @@!    @@!
+  !@!    !@!  @!@  !@!  @!@  !@!         !@!    !@!
+  @!!    @!@  !@!  @!@!!@!   @!!!:!      @!!    @!!!:!
+  !!!    !@!  !!!  !!@!@!    !!!!!:      !!!    !!!!!:
+  !!:    !!:  !!!  !!: :!!   !!:         !!:    !!:
+  :!:    :!:  !:!  :!:  !:!  :!:         :!:    :!:
+   ::    ::::: ::  ::   :::   :: ::::     ::     :: ::::
+   :      : :  :    :   : :  : :: ::      :     : :: ::
+"
+
+# Comprobar si el usuario es root
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        echo "Este script debe ejecutarse como root"
+        exit 1
+    fi
+}
+
+# Comprobar si Tor está instalado
+check_tor_installed() {
+    if ! command -v tor &> /dev/null; then
+        echo "Tor no está instalado. Instálalo con 'sudo apt-get install tor'"
+        exit 1
+    fi
+}
+
+# Comprobar si Torsocks está instalado
+check_torsocks_installed() {
+    if ! command -v torsocks &> /dev/null; then
+        echo "Torsocks no está instalado. Instálalo con 'sudo apt-get install torsocks'"
+        exit 1
+    fi
+}
+
+# Encender Torsocks
+turn_on_torsocks() {
+    echo "Encendiendo Torsocks..."
+    if grep -qF '. torsocks off' ~/.bashrc; then
+        sed -i '/. torsocks off/d' ~/.bashrc
+    fi
+    if ! grep -qF '. torsocks on' ~/.bashrc; then
+        echo '. torsocks on' >> ~/.bashrc
+    fi
+    echo "Torsocks está encendido."
+}
+
+# Apagar Torsocks
+turn_off_torsocks() {
+    echo "Apagando Torsocks..."
+    if grep -qF '. torsocks on' ~/.bashrc; then
+        sed -i '/. torsocks on/d' ~/.bashrc
+    fi
+    if ! grep -qF '. torsocks off' ~/.bashrc; then
+        echo '. torsocks off' >> ~/.bashrc
+    fi
+    echo "Torsocks está apagado."
+}
+
+# Cambiar el nodo Tor
+change_tor_node() {
+    echo "Cambiando el nodo Tor..."
+    if grep -qF '. torsocks on' ~/.bashrc; then
+        echo "Apagando Torsocks..."
+        if grep -qF '. torsocks on' ~/.bashrc; then
+            sed -i '/. torsocks on/d' ~/.bashrc
+        fi
+        if ! grep -qF '. torsocks off' ~/.bashrc; then
+            echo '. torsocks off' >> ~/.bashrc
+        fi
+        echo "Torsocks está apagado."
+        source ~/.bashrc
+        echo "Reiniciando el servicio Tor..."
+        systemctl restart tor
+        turn_on_torsocks
+        echo "Nodo Tor cambiado exitosamente."
+
+    else
+        echo "Reiniciando el servicio Tor..."
+        sudo systemctl restart tor
+        turn_on_torsocks
+        echo "Nodo Tor cambiado exitosamente."
+    fi
+}
+
+# Verificar requisitos
+check_root
+check_tor_installed
+check_torsocks_installed
+
+# Controlar la acción según el argumento
+case $1 in
+    "on") 
+        turn_on_torsocks
+        ;;
+    "off") 
+        turn_off_torsocks
+        ;;
+    "change")
+        change_tor_node
+        ;;
+    *)
+        echo "Uso: $0 [on|off|change]";;
+esac
+
+source ~/.bashrc
+sleep 1
+echo "Comprobando la IP..."
+current_ip=$(curl -s ifconfig.me)
+current_ip1=$(curl -s ipinfo.io)
+echo -e "Tu dirección IP actual es:\n$current_ip\n$current_ip1"
