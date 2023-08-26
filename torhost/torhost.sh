@@ -50,6 +50,8 @@ stophs(){
 checkhs(){
     echo "La direccion del hidden service es:"
     cat /var/lib/tor/hidden_service/hostname
+    echo -e "\nConfiguración de puertos en /etc/tor/torrc:"
+    grep "HiddenServicePort" /etc/tor/torrc | tail -n 2
 }
 
 changehs(){
@@ -62,12 +64,32 @@ changehs(){
     cat /var/lib/tor/hidden_service/hostname
 }
 
+listenhs(){
+    echo "Configurando el servicio oculto para apuntar al listener de Netcat en el puerto $port..."
+    
+    if grep -q "HiddenServicePort" /etc/tor/torrc; then
+        # Sobrescribir las líneas de configuración
+        echo "Sobrescribiendo la configuración en el archivo torrc..."
+        sed -i "/HiddenServicePort/c\HiddenServicePort 80 127.0.0.1:$port" /etc/tor/torrc
+        # Reiniciar el servicio Tor para aplicar los cambios
+        systemctl restart tor
+    else
+        # Agregar las líneas de configuración si no existen
+        echo "Configurando el archivo torrc..."
+        echo "HiddenServiceDir /var/lib/tor/hidden_service/" >> /etc/tor/torrc
+        echo "HiddenServicePort 80 127.0.0.1:$port" >> /etc/tor/torrc
+        # Reiniciar el servicio Tor para aplicar los cambios
+        systemctl restart tor
+    fi
+}
+
 start(){
     [ "$(id -u)" != "0" ] && echo "Este script debe ser ejecutado como root" && exit 1
     command -v tor >/dev/null 2>&1 || { echo >&2 "Tor no está instalado en el sistema."; exit 1; }
 }
 
 cmd=$1
+port=4444
 if [ -z "$1" ]; then
     banner
     panel
@@ -85,8 +107,10 @@ opciones(){
         checkhs
     elif [ $cmd = "install" ]; then
         installhs
+    elif [ $cmd = "listen" ]; then
+        listenhs
     elif [ $cmd = "" ]; then
-        echo "Parametro inválido."
+        echo "Parámetro inválido."
     else
         echo "Parámetro inválido." 
     fi
