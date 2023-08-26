@@ -13,6 +13,7 @@ By default it uses port 80. Can be upgraded to establish TLS conecction but is n
 - stop - Stop your hidden service.
 - change - Change hidden service hostname's and print the new one.
 - check - Check the hostname of your hidden service.
+- listen - Bind hidden service port to netcat local port.
 
 #### Usage/Examples
 
