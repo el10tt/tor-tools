@@ -45,6 +45,13 @@ turn_on_torsocks() {
     if ! grep -qF '. torsocks on' ~/.bashrc; then
         echo '. torsocks on' >> ~/.bashrc
     fi
+
+    # Verificar y empezar el servicio de Tor si no está corriendo
+    if ! systemctl is-active --quiet tor; then
+        echo "Iniciando el servicio Tor..."
+        sudo systemctl start tor
+    fi
+
     echo "Torsocks está encendido."
 }
 
