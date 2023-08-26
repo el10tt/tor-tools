@@ -42,7 +42,9 @@ This script has been tested on Debian, Kali, and Parrot, but can work on other s
 . torete change
 ```
 
-![image](https://github.com/el10tt/tor-tools/assets/124470922/0255dab8-4761-4435-8d30-8d422d05babc)
-![image](https://github.com/el10tt/tor-tools/assets/124470922/e83550bc-ede8-4de2-974a-040e233058da)
+![image](https://github.com/el10tt/tor-tools/assets/124470922/936ab6cc-089e-48c5-935f-7ac67b4f14da)
+
+
+
 
 
